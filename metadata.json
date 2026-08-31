@@ -1,0 +1,6 @@
+{
+  "name": "AI News & Blogging Platform",
+  "description": "Production-ready AI-powered news, blogging, and journalism platform with admin panel, RBAC, automated SEO, Inshorts feed, and Gemini content engine.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
