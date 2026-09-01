@@ -252,7 +252,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans flex flex-col justify-between selection:bg-[#F27D26] selection:text-white">
+    <div className="min-h-screen bg-white text-gray-900 font-sans flex flex-col justify-between selection:bg-[#F27D26] selection:text-white">
       {/* 1. Top Real-Time Breaking News Ticker */}
       <BreakingTicker
         articles={articles}
@@ -316,25 +316,25 @@ export default function App() {
           /* VIEW C: Default News Website Homepage */
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
             {/* Top Billboard AdSense Placement */}
-            <div className="bg-[#0D0D0D] border border-white/10 rounded-3xl p-3 text-center">
-              <div className="text-[10px] uppercase font-mono font-bold text-[#00FF41] tracking-[0.2em] mb-1.5">
+            <div className="bg-slate-50 border border-gray-200 rounded-3xl p-3 text-center">
+              <div className="text-[10px] uppercase font-mono font-bold text-[#F27D26] tracking-[0.2em] mb-1.5">
                 // SPONSORED BILLBOARD • LEADERBOARD 728X90
               </div>
-              <div className="bg-black text-white p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-white/10">
+              <div className="bg-gray-50 text-gray-900 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-gray-300">
                 <div className="flex items-center gap-3 text-left">
                   <span className="px-2.5 py-1 bg-[#F27D26] text-white rounded-full font-black text-xs uppercase tracking-wider">
                     CLOUD ENGINE
                   </span>
                   <div>
-                    <div className="text-sm font-black uppercase tracking-tight text-white">Google Cloud Vertex AI Enterprise Suite</div>
-                    <div className="text-xs text-white/60 font-mono">Deploy high-performance multimodal models with zero latency overhead.</div>
+                    <div className="text-sm font-black uppercase tracking-tight text-gray-900">Google Cloud Vertex AI Enterprise Suite</div>
+                    <div className="text-xs text-gray-600 font-mono">Deploy high-performance multimodal models with zero latency overhead.</div>
                   </div>
                 </div>
                 <a
                   href="https://cloud.google.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-white hover:bg-[#F27D26] text-black hover:text-white text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition shrink-0"
+                  className="bg-[#F27D26] hover:bg-orange-600 text-white hover:text-white text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition shrink-0"
                 >
                   Explore Free Tier
                 </a>
@@ -343,16 +343,16 @@ export default function App() {
 
             {/* Category Title Heading (if filtered) */}
             {selectedCategorySlug && (
-              <div className="flex items-center justify-between pb-4 border-b border-white/10">
+              <div className="flex items-center justify-between pb-4 border-b border-gray-200">
                 <div className="flex items-center gap-3">
                   <span className="w-3 h-3 rounded-full bg-[#F27D26]"></span>
-                  <h1 className="text-3xl font-black uppercase tracking-tighter text-white">
+                  <h1 className="text-3xl font-black uppercase tracking-tighter text-gray-900">
                     {selectedCategorySlug.replace('-', ' ')} STORIES
                   </h1>
                 </div>
                 <button
                   onClick={() => setSelectedCategorySlug(null)}
-                  className="text-xs font-mono font-bold text-[#00FF41] uppercase tracking-wider hover:underline"
+                  className="text-xs font-mono font-bold text-[#F27D26] uppercase tracking-wider hover:underline"
                 >
                   Clear filter // View all
                 </button>
@@ -373,7 +373,7 @@ export default function App() {
                     onOpenWhatsAppShare={handleOpenWhatsAppShare}
                   />
                 ) : (
-                  <div className="p-12 text-center text-white/40 bg-[#0D0D0D] rounded-3xl border border-white/10 font-mono">
+                  <div className="p-12 text-center text-gray-500 bg-slate-50 rounded-3xl border border-gray-200 font-mono">
                     No stories found in this category.
                   </div>
                 )}
@@ -381,13 +381,13 @@ export default function App() {
 
               {/* Right: Trending Now Sidebar (4 Cols) */}
               <aside className="lg:col-span-4 space-y-6">
-                <div className="bg-[#0D0D0D] p-6 rounded-3xl border border-white/10 shadow-2xl">
-                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-white/10">
+                <div className="bg-slate-50 p-6 rounded-3xl border border-gray-200 shadow-md">
+                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-gray-200">
                     <div className="flex items-center gap-2 text-[#F27D26] font-black text-xs uppercase tracking-widest">
                       <Flame className="w-4 h-4" />
                       <span>TRENDING NOW</span>
                     </div>
-                    <span className="text-[10px] text-white/40 font-mono uppercase">REAL-TIME VIEWS</span>
+                    <span className="text-[10px] text-gray-600 font-mono uppercase">REAL-TIME VIEWS</span>
                   </div>
 
                   <div className="space-y-3">
@@ -406,20 +406,20 @@ export default function App() {
                 </div>
 
                 {/* Inshorts 60s Fast Pitch Box */}
-                <div className="bg-[#F27D26] text-white p-6 rounded-3xl shadow-2xl relative overflow-hidden">
-                  <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white/90 mb-2">
+                <div className="bg-[#F27D26] text-white p-6 rounded-3xl shadow-md relative overflow-hidden">
+                  <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white mb-2">
                     <Zap className="w-4 h-4" />
                     <span>INSHORTS FAST MODE</span>
                   </div>
                   <h3 className="font-black text-2xl uppercase tracking-tight leading-tight mb-2">
                     CATCH UP ON 10 STORIES IN 3 MINUTES
                   </h3>
-                  <p className="text-xs text-white/90 leading-relaxed mb-5 font-medium">
+                  <p className="text-xs text-white leading-relaxed mb-5 font-medium">
                     Experience bite-sized 60-word briefs with neural voice playback and 1-click WhatsApp digests.
                   </p>
                   <button
                     onClick={() => setCurrentView('inshorts')}
-                    className="w-full bg-black text-white hover:bg-white hover:text-black text-xs font-black uppercase tracking-wider py-3 rounded-full transition flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                    className="w-full bg-white text-[#F27D26] hover:bg-gray-100 hover:text-orange-600 text-xs font-black uppercase tracking-wider py-3 rounded-full transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
                   >
                     <span>Launch 60s Flash Feed</span>
                     <ChevronRight className="w-4 h-4" />
@@ -430,14 +430,14 @@ export default function App() {
 
             {/* Latest Editorial Feed Grid */}
             <section className="space-y-6 pt-6">
-              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center justify-between pb-3 border-b border-gray-200">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#00FF41] animate-pulse"></span>
-                  <h2 className="text-2xl font-black uppercase tracking-tight text-white">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#F27D26] animate-pulse"></span>
+                  <h2 className="text-2xl font-black uppercase tracking-tight text-gray-900">
                     LATEST EDITORIAL STORIES &amp; REPORTS
                   </h2>
                 </div>
-                <div className="text-xs font-mono text-white/40 uppercase">
+                <div className="text-xs font-mono text-gray-500 uppercase">
                   [{gridArticles.length} STORIES PUBLISHED]
                 </div>
               </div>
