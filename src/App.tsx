@@ -13,17 +13,17 @@ import {
   MOCK_USERS, 
   MOCK_ADS, 
   MOCK_MEDIA 
-} from './data/mockData';
-import { Header } from './components/Header';
-import { BreakingTicker } from './components/BreakingTicker';
-import { ArticleCard } from './components/ArticleCard';
-import { ArticleReader } from './components/ArticleReader';
-import { InshortsView } from './components/InshortsView';
+} from '../../src/data/mockData';
+import { Header } from '../../src/components/Header';
+import { BreakingTicker } from '../../src/components/BreakingTicker';
+import { ArticleCard } from '../../src/components/ArticleCard';
+import { ArticleReader } from '../../src/components/ArticleReader';
+import { InshortsView } from '../../src/components/InshortsView';
 import { WhatsAppShareModal } from './components/WhatsAppShareModal';
-import { SearchModal } from './components/SearchModal';
-import { BookmarksDrawer } from './components/BookmarksDrawer';
-import { Footer } from './components/Footer';
-import { AdminDashboard } from './components/admin/AdminDashboard';
+import { SearchModal } from '../../src/components/SearchModal';
+import { BookmarksDrawer } from '../../src/components/BookmarksDrawer';
+import { Footer } from '../../src/components/Footer';
+import { AdminDashboard } from '../../src/components/admin/AdminDashboard';
 import { 
   TrendingUp, 
   Sparkles, 
