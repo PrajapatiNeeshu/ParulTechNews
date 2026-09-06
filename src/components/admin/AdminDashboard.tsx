@@ -19,6 +19,7 @@ import {
   TrendingUp, 
   Flame, 
   ArrowUpRight,
+  ArrowLeft,
   Shield,
   Layers,
   BarChart3,
@@ -75,6 +76,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onViewWebsite,
 }) => {
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+  const [tabHistory, setTabHistory] = useState<AdminTab[]>([]);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [postFilterStatus, setPostFilterStatus] = useState<string>('all');
   const [postFilterCategory, setPostFilterCategory] = useState<string>('all');
@@ -104,12 +106,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const handleStartCreatePost = () => {
     setEditingArticle(null);
-    setActiveTab('editor');
+    navigateToTab('editor');
   };
 
   const handleStartEditPost = (article: Article) => {
     setEditingArticle(article);
-    setActiveTab('editor');
+    navigateToTab('editor');
+  };
+
+  const navigateToTab = (nextTab: AdminTab) => {
+    if (nextTab === activeTab) return;
+    setTabHistory((history) => [...history, activeTab]);
+    setActiveTab(nextTab);
+  };
+
+  const handleAdminBack = () => {
+    const previousTab = tabHistory[tabHistory.length - 1];
+    if (previousTab) {
+      setTabHistory((history) => history.slice(0, -1));
+      setActiveTab(previousTab);
+      return;
+    }
+    onViewWebsite();
   };
 
   const handleSavePost = (articleData: Partial<Article>) => {
@@ -198,7 +216,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     if (item.id === 'editor' && !editingArticle) {
                       setEditingArticle(null);
                     }
-                    setActiveTab(item.id as AdminTab);
+                    navigateToTab(item.id as AdminTab);
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition cursor-pointer ${
                     isActive
@@ -242,6 +260,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Main Admin Body */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-h-screen">
+        <div className="mb-5 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={handleAdminBack}
+            className="flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-2 text-[10px] font-mono font-bold uppercase tracking-wider text-white/60 transition hover:border-[#F27D26] hover:text-[#F27D26]"
+            title={tabHistory.length ? 'Go to previous admin page' : 'Return to public news site'}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>{tabHistory.length ? 'Back' : 'Back to Website'}</span>
+          </button>
+          <span className="text-[10px] font-mono uppercase tracking-widest text-white/35">// {activeTab.replace('_', ' ')}</span>
+        </div>
         {/* VIEW: OVERVIEW DASHBOARD */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
@@ -332,7 +362,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
 
                 <button
-                  onClick={() => setActiveTab('ai_lab')}
+                  onClick={() => navigateToTab('ai_lab')}
                   className="bg-[#F27D26] hover:bg-[#d96a1a] text-white font-black uppercase text-xs py-3 px-4 rounded-full flex items-center justify-center gap-2 transition cursor-pointer shadow-lg tracking-wider"
                 >
                   <Sparkles className="w-4 h-4" />
@@ -346,7 +376,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div className="p-5 border-b border-white/10 flex items-center justify-between">
                 <h3 className="font-black text-sm text-white uppercase tracking-tight">Recent &amp; Trending Stories</h3>
                 <button
-                  onClick={() => setActiveTab('posts')}
+                  onClick={() => navigateToTab('posts')}
                   className="text-xs font-mono font-bold text-[#00FF41] hover:underline uppercase"
                 >
                   View All Posts →
@@ -543,7 +573,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             categories={categories}
             currentUser={currentUser}
             onSave={handleSavePost}
-            onCancel={() => setActiveTab('posts')}
+            onCancel={handleAdminBack}
           />
         )}
 
