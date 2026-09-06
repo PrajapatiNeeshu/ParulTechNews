@@ -41,7 +41,9 @@ export default function App() {
   // App Core State
   const [articles, setArticles] = useState<Article[]>(() => {
     const saved = localStorage.getItem('presscore_articles');
-    return saved ? JSON.parse(saved) : MOCK_ARTICLES;
+    if (!saved) return MOCK_ARTICLES;
+    const parsed = JSON.parse(saved) as Article[];
+    return Array.from(new Map(parsed.map((article) => [article.id, article])).values());
   });
 
   const [categories] = useState<Category[]>(MOCK_CATEGORIES);
@@ -258,6 +260,7 @@ export default function App() {
   if (currentView === 'admin') {
     return (
       <AdminDashboard
+        theme={theme}
         articles={articles}
         categories={categories}
         users={users}

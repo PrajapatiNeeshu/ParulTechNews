@@ -1,0 +1,9 @@
+import React, { useState } from 'react';
+import { Monitor, Smartphone, Tablet } from 'lucide-react';
+
+interface PreviewPanelProps { title: string; excerpt: string; image: string; html: string; }
+export const PreviewPanel: React.FC<PreviewPanelProps> = ({ title, excerpt, image, html }) => {
+  const [device, setDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  const width = device === 'desktop' ? 'w-full' : device === 'tablet' ? 'max-w-[720px]' : 'max-w-[390px]';
+  return <div className="rounded-2xl border border-[#262626] bg-[#0b0b0b] p-4"><div className="mb-4 flex items-center justify-between"><span className="text-[10px] font-mono uppercase tracking-widest text-[#ff8c00]">Publishing preview</span><div className="flex gap-1">{([['desktop', Monitor], ['tablet', Tablet], ['mobile', Smartphone]] as const).map(([name, Icon]) => <button type="button" key={name} title={`${name} preview`} onClick={() => setDevice(name)} className={`rounded-lg p-2 ${device === name ? 'bg-[#ff8c00] text-black' : 'text-white/50 hover:bg-white/10'}`}><Icon className="h-4 w-4" /></button>)}</div></div><article className={`${width} mx-auto overflow-hidden rounded-xl border border-[#262626] bg-[#141414] transition-all`}><div className="p-5 sm:p-8"><div className="mb-3 text-[10px] font-mono uppercase text-[#ff8c00]">AI / FEATURED STORY</div><h1 className="text-2xl font-black leading-tight text-white">{title || 'Untitled article'}</h1><p className="mt-3 text-sm leading-relaxed text-white/55">{excerpt || 'Your excerpt preview will appear here.'}</p>{image && <img src={image} alt="" className="mt-5 aspect-video w-full rounded-xl object-cover" />}<div className="editor-preview mt-6 text-sm leading-7 text-white/80" dangerouslySetInnerHTML={{ __html: html || '<p>Your article content preview will appear here.</p>' }} /></div></article></div>;
+};

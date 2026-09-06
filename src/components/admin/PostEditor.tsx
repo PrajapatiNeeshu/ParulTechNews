@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Article, Category, User } from '../../types';
 import { geminiService } from '../../services/geminiService';
+import { RichTextEditor } from '../editor/RichTextEditor';
 
 interface PostEditorProps {
   article: Article | null; // null if creating new
@@ -39,6 +40,9 @@ export const PostEditor: React.FC<PostEditorProps> = ({
   const [slug, setSlug] = useState(article?.slug || '');
   const [excerpt, setExcerpt] = useState(article?.excerpt || '');
   const [content, setContent] = useState(article?.content || '');
+  const [contentHtml, setContentHtml] = useState(article?.contentHtml || '');
+  const [contentMarkdown, setContentMarkdown] = useState(article?.contentMarkdown || article?.content || '');
+  const [editorVersion, setEditorVersion] = useState(0);
   const [category, setCategory] = useState(article?.category || categories[0]?.name || 'Technology');
   const [subCategory, setSubCategory] = useState(article?.subCategory || '');
   const [tags, setTags] = useState(article?.tags.join(', ') || 'AI, Technology, News');
@@ -125,6 +129,9 @@ export const PostEditor: React.FC<PostEditorProps> = ({
     try {
       const result = await geminiService.checkGrammar(content);
       setContent(result.correctedText);
+      setContentMarkdown(result.correctedText);
+      setContentHtml('');
+      setEditorVersion((version) => version + 1);
       alert(`Grammar check complete: ${result.feedback || 'Text polished successfully.'}`);
     } catch (err) {
       console.error(err);
@@ -174,6 +181,8 @@ export const PostEditor: React.FC<PostEditorProps> = ({
       slug: slug.trim() || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       excerpt: excerpt.trim() || title,
       content: content.trim() || 'Article content is being drafted...',
+      contentHtml: contentHtml.trim() || undefined,
+      contentMarkdown: contentMarkdown.trim() || content.trim() || undefined,
       category,
       subCategory: subCategory.trim() || undefined,
       tags: tagArray.length > 0 ? tagArray : ['News', 'Technology'],
@@ -403,19 +412,27 @@ export const PostEditor: React.FC<PostEditorProps> = ({
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-[10px] font-mono font-bold text-white/70 uppercase tracking-wider">
-                // FULL ARTICLE CONTENT (MARKDOWN) *
+                // FULL ARTICLE CONTENT (RICH TEXT) *
               </label>
               <span className="text-[10px] font-mono text-white/40 uppercase">
                 {content.split(/\s+/).filter(Boolean).length} words • ~{Math.max(1, Math.ceil(content.split(/\s+/).filter(Boolean).length / 200))} min read
               </span>
             </div>
-            <textarea
-              rows={12}
-              placeholder="Write or generate your markdown article here. Use ## Headings, ### Subheadings, > Quotes, - Bullet points..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="w-full bg-black border border-white/10 rounded-2xl p-4 text-xs sm:text-sm font-sans leading-relaxed text-white placeholder-white/30 focus:border-[#F27D26] outline-none"
-              required
+            <RichTextEditor
+              key={editorVersion}
+              initialContent={article?.contentHtml}
+              initialMarkdown={article?.contentMarkdown || article?.content || ''}
+              title={title}
+              excerpt={excerpt}
+              featuredImage={featuredImage}
+              metaDescription={metaDescription}
+              keywords={focusKeywords}
+              storageKey={`presscore-editor-${article?.id || 'new'}`}
+              onChange={({ html, markdown, text }) => {
+                setContentHtml(html);
+                setContentMarkdown(markdown);
+                setContent(markdown || text);
+              }}
             />
           </div>
 

@@ -24,7 +24,7 @@ import {
   BarChart3,
   RefreshCw
 } from 'lucide-react';
-import { Article, Category, User, AdUnit, MediaItem, RoleType } from '../../types';
+import { Article, Category, User, AdUnit, MediaItem, RoleType, ThemeMode } from '../../types';
 import { PostEditor } from './PostEditor';
 import { SeoCenter } from './SeoCenter';
 import { RbacManager } from './RbacManager';
@@ -34,6 +34,7 @@ import { NotificationDispatcher } from './NotificationDispatcher';
 import { AiStudioLab } from './AiStudioLab';
 
 interface AdminDashboardProps {
+  theme: ThemeMode;
   articles: Article[];
   categories: Category[];
   users: User[];
@@ -55,6 +56,7 @@ interface AdminDashboardProps {
 type AdminTab = 'overview' | 'posts' | 'editor' | 'ai_lab' | 'seo' | 'media' | 'rbac' | 'adsense' | 'broadcast' | 'settings';
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
+  theme,
   articles,
   categories,
   users,
@@ -135,7 +137,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col md:flex-row font-sans">
+    <div className={`admin-theme min-h-screen flex flex-col md:flex-row font-sans transition-colors duration-200 ${theme === 'dark' ? 'bg-[#050505] text-white' : 'bg-[#F4F5F7] text-zinc-950'}`}>
       {/* Admin Sidebar Navigation */}
       <aside className="w-full md:w-64 bg-[#0A0A0A] text-white/70 p-4 shrink-0 flex flex-col justify-between border-r border-white/10">
         <div>

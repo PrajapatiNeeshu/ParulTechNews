@@ -62,3 +62,72 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.editor-content p { margin: 0.75rem 0; }
+.editor-content h1, .editor-content h2, .editor-content h3, .editor-content h4 { margin: 1.25rem 0 0.65rem; font-weight: 800; line-height: 1.2; }
+.editor-content h1 { font-size: 2rem; }
+.editor-content h2 { font-size: 1.5rem; }
+.editor-content h3 { font-size: 1.25rem; }
+.editor-content h4 { font-size: 1.1rem; }
+.editor-content ul, .editor-content ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+.editor-content ul { list-style: disc; }
+.editor-content ol { list-style: decimal; }
+.editor-content blockquote { border-left: 3px solid #ff8c00; margin: 1rem 0; padding-left: 1rem; color: rgba(255,255,255,.7); }
+.editor-content pre { overflow-x: auto; border: 1px solid #262626; border-radius: .75rem; background: #050505; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: .8rem; }
+.editor-content code { border-radius: .25rem; background: rgba(255,255,255,.08); padding: .1rem .3rem; font-family: 'JetBrains Mono', monospace; font-size: .85em; }
+.editor-content pre code { background: transparent; padding: 0; }
+.editor-content a { color: #ff8c00; text-decoration: underline; }
+.editor-content hr { margin: 1.5rem 0; border-color: #262626; }
+.editor-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.editor-content th, .editor-content td { border: 1px solid #262626; padding: .5rem; text-align: left; }
+.editor-content th { background: #1b1b1b; color: #ff8c00; }
+.editor-content img { display: block; height: auto; max-width: 100%; margin: 1rem auto; }
+.editor-content img[style*="text-align: left"] { margin-left: 0; margin-right: auto; }
+.editor-content img[style*="text-align: right"] { margin-left: auto; margin-right: 0; }
+.editor-content .youtube-wrapper, .editor-content iframe { max-width: 100%; }
+.editor-content ul[data-type="taskList"] { list-style: none; padding-left: 0; }
+.editor-content ul[data-type="taskList"] li { display: flex; gap: .5rem; align-items: flex-start; }
+.editor-content ul[data-type="taskList"] li > label { margin-top: .35rem; }
+.editor-preview p { margin: .75rem 0; }
+.editor-preview h1, .editor-preview h2, .editor-preview h3, .editor-preview h4 { margin: 1.2rem 0 .5rem; font-weight: 800; color: white; }
+.editor-preview ul, .editor-preview ol { padding-left: 1.5rem; }
+.editor-preview ul { list-style: disc; }
+.editor-preview ol { list-style: decimal; }
+
+/* Admin panels share the global theme, including legacy dark utility classes. */
+[data-theme="light"] .admin-theme [class*="bg-[#050505"],
+[data-theme="light"] .admin-theme [class*="bg-[#0A0A0A"],
+[data-theme="light"] .admin-theme [class*="bg-[#0D0D0D"],
+[data-theme="light"] .admin-theme [class*="bg-[#141414"],
+[data-theme="light"] .admin-theme [class~="bg-black"] {
+  background-color: #ffffff !important;
+}
+[data-theme="light"] .admin-theme [class*="text-white"] {
+  color: #111827 !important;
+}
+[data-theme="light"] .admin-theme [class*="border-white"],
+[data-theme="light"] .admin-theme [class*="border-[#262626"] {
+  border-color: #d1d5db !important;
+}
+[data-theme="light"] .admin-theme [class*="placeholder-white"]::placeholder {
+  color: #6b7280 !important;
+}
+[data-theme="light"] .admin-theme button[class*="F27D26"],
+[data-theme="light"] .admin-theme [class*="00FF41"] {
+  color: #000000 !important;
+}
+[data-theme="light"] .admin-theme button[class*="F27D26"] {
+  color: #ffffff !important;
+}
+[data-theme="light"] .admin-theme input,
+[data-theme="light"] .admin-theme textarea,
+[data-theme="light"] .admin-theme select {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+  border-color: #d1d5db !important;
+}
+[data-theme="light"] .admin-theme .editor-content,
+[data-theme="light"] .admin-theme .editor-content pre {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}

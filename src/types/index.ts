@@ -59,6 +59,8 @@ export interface Article {
   slug: string;
   excerpt: string;
   content: string;
+  contentHtml?: string;
+  contentMarkdown?: string;
   category: string;
   subCategory?: string;
   tags: string[];

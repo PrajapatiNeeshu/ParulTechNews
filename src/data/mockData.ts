@@ -593,7 +593,7 @@ Automakers have already scheduled flagship sedan and SUV platforms for delivery 
     comments: [
       {
         id: 'c-3',
-        articleId: 'art-2',
+        articleId: 'art-3',
         userName: 'Kenji Sato',
         userAvatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80',
         content: 'If production yields hold at scale, this completely resets the competitive landscape between ICE and EV.',
@@ -603,7 +603,7 @@ Automakers have already scheduled flagship sedan and SUV platforms for delivery 
     ]
   },
   {
-    id: 'art-3',
+    id: 'art-7',
     title: 'Global Tech Hiring Index: High-Impact Roles in Demand as AI Specialization Dominates 2026',
     slug: 'global-tech-hiring-index-ai-specialization-2026',
     excerpt: 'New employment data highlights record-breaking compensation for AI alignment researchers, distributed systems architects, and cyber resilience engineers.',
