@@ -264,7 +264,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <button
             type="button"
             onClick={handleAdminBack}
-            className="flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-2 text-[10px] font-mono font-bold uppercase tracking-wider text-white/60 transition hover:border-[#F27D26] hover:text-[#F27D26]"
+            className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-wider transition shadow-sm ${
+              theme === 'dark'
+                ? 'border-white/20 bg-[#141414] text-white hover:border-[#F27D26] hover:bg-[#F27D26] hover:text-white'
+                : 'border-[#F27D26]/50 bg-white text-zinc-800 hover:border-[#F27D26] hover:bg-[#F27D26] hover:text-white'
+            }`}
             title={tabHistory.length ? 'Go to previous admin page' : 'Return to public news site'}
           >
             <ArrowLeft className="h-4 w-4" />
