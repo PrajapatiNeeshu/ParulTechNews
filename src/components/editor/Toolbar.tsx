@@ -3,7 +3,7 @@ import {
   AlignCenter, AlignJustify, AlignLeft, AlignRight, Bold, CheckSquare, Code2,
   FileCode2, Highlighter, ImagePlus, Italic, Link as LinkIcon, List,
   ListOrdered, Minus, Palette, Quote, Redo2, Strikethrough, Table2, Type,
-  Underline, Undo2, Video, Youtube,
+  Underline, Undo2, Video, Youtube, Plus,
 } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 
@@ -28,6 +28,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({ editor, onInsertImage, onInser
     else editor.chain().focus().setLink({ href: url.trim() }).run();
   };
   const setFontSize = (size: string) => editor.chain().focus().setMark('textStyle', { fontSize: size }).run();
+  const changeFontSize = (direction: 'increase' | 'decrease') => {
+    const sizes = [12, 14, 16, 18, 20, 24, 32, 48];
+    const currentSize = Number.parseInt(editor.getAttributes('textStyle').fontSize || '', 10) || 16;
+    const currentIndex = sizes.reduce((closest, size, index) => Math.abs(size - currentSize) < Math.abs(sizes[closest] - currentSize) ? index : closest, 0);
+    const nextIndex = direction === 'increase' ? Math.min(sizes.length - 1, currentIndex + 1) : Math.max(0, currentIndex - 1);
+    setFontSize(`${sizes[nextIndex]}px`);
+  };
   const setColor = (color: string) => editor.chain().focus().setColor(color).run();
   const setHighlight = (color: string) => editor.chain().focus().toggleHighlight({ color }).run();
 
@@ -40,6 +47,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({ editor, onInsertImage, onInser
         <select aria-label="Font size" className="h-9 rounded-lg border border-[#262626] bg-[#0b0b0b] px-2 text-[11px] text-white outline-none" defaultValue="" onChange={(e) => setFontSize(e.target.value)}>
           <option value="" disabled>Size</option>{['12px', '14px', '16px', '18px', '20px', '24px', '32px', '48px'].map((size) => <option key={size} value={size}>{size}</option>)}
         </select>
+        <button type="button" title="Decrease selected text size" aria-label="Decrease selected text size" className={buttonClass()} onClick={() => changeFontSize('decrease')}><span className="text-[11px] font-black">A−</span></button>
+        <button type="button" title="Increase selected text size" aria-label="Increase selected text size" className={buttonClass()} onClick={() => changeFontSize('increase')}><span className="flex items-center text-[11px] font-black">A<Plus className="h-2.5 w-2.5" /></span></button>
         <span className="mx-1 h-6 w-px bg-[#262626]" />
         <button type="button" title="Bold" className={buttonClass(editor.isActive('bold'))} onClick={() => editor.chain().focus().toggleBold().run()}><Bold className="h-4 w-4" /></button>
         <button type="button" title="Italic" className={buttonClass(editor.isActive('italic'))} onClick={() => editor.chain().focus().toggleItalic().run()}><Italic className="h-4 w-4" /></button>
