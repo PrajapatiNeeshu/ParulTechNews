@@ -53,6 +53,9 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleTheme,
 }) => {
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = React.useState(false);
+  const [now, setNow] = React.useState(() => new Date());
+  const [temperature, setTemperature] = React.useState<number | null>(null);
+  const [weatherLabel, setWeatherLabel] = React.useState('LOCAL WEATHER');
   const roleSwitcherRef = React.useRef<HTMLDivElement>(null);
   const categoryScrollerRef = React.useRef<HTMLDivElement>(null);
 
@@ -73,6 +76,48 @@ export const Header: React.FC<HeaderProps> = ({
     };
   }, []);
 
+  React.useEffect(() => {
+    const clock = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(clock);
+  }, []);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    const loadWeather = async (latitude: number, longitude: number) => {
+      try {
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&temperature_unit=celsius`);
+        if (!response.ok) throw new Error('Weather request failed');
+        const data = await response.json() as { current?: { temperature_2m?: number; weather_code?: number } };
+        if (!cancelled && typeof data.current?.temperature_2m === 'number') {
+          setTemperature(Math.round(data.current.temperature_2m));
+          setWeatherLabel('LIVE LOCAL TEMP');
+        }
+      } catch {
+        if (!cancelled) setWeatherLabel('WEATHER UNAVAILABLE');
+      }
+    };
+    const fallbackLocation = () => loadWeather(28.6139, 77.2090);
+    if (!navigator.geolocation) {
+      fallbackLocation();
+    } else {
+      navigator.geolocation.getCurrentPosition(
+        (position) => loadWeather(position.coords.latitude, position.coords.longitude),
+        fallbackLocation,
+        { timeout: 5000, maximumAge: 900000 }
+      );
+    }
+    const refresh = window.setInterval(() => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => loadWeather(position.coords.latitude, position.coords.longitude),
+          fallbackLocation,
+          { timeout: 5000, maximumAge: 900000 }
+        );
+      }
+    }, 900000);
+    return () => { cancelled = true; window.clearInterval(refresh); };
+  }, []);
+
   const scrollCategories = (direction: 'left' | 'right') => {
     categoryScrollerRef.current?.scrollBy({
       left: direction === 'right' ? 280 : -280,
@@ -86,7 +131,13 @@ export const Header: React.FC<HeaderProps> = ({
     month: 'short',
     day: 'numeric',
     year: 'numeric',
-  }).format(new Date());
+  }).format(now);
+  const timeFormatted = new Intl.DateTimeFormat('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(now);
+  const selectedContext = selectedCategory ? categories.find((category) => category.slug === selectedCategory)?.name : 'ALL NEWS';
 
   const isDark = theme === 'dark';
 
@@ -116,13 +167,16 @@ export const Header: React.FC<HeaderProps> = ({
             <span className={`font-mono text-[11px] uppercase tracking-wider ${
               isDark ? 'text-white/50' : 'text-zinc-500'
             }`}>
-              {todayFormatted}
+              {todayFormatted} • {timeFormatted}
             </span>
             <span className={isDark ? 'text-white/20' : 'text-zinc-300'}>|</span>
             <div className="flex items-center gap-2 text-[11px] font-mono">
-              <span className={isDark ? 'text-[#00FF41] font-bold' : 'text-emerald-700 font-bold'}>S&amp;P 500 ▲ 5,648.40 (+0.4%)</span>
+              <CloudSun className={`h-3.5 w-3.5 ${isDark ? 'text-[#00FF41]' : 'text-emerald-700'}`} />
+              <span className={isDark ? 'text-[#00FF41] font-bold' : 'text-emerald-700 font-bold'}>
+                {weatherLabel}: {temperature === null ? '--' : `${temperature}°C`}
+              </span>
               <span className={isDark ? 'text-white/20' : 'text-zinc-300'}>•</span>
-              <span className={isDark ? 'text-[#00FF41] font-bold' : 'text-emerald-700 font-bold'}>NASDAQ ▲ 17,870 (+0.7%)</span>
+              <span className={isDark ? 'text-white/50' : 'text-zinc-500'}>{selectedContext}</span>
             </div>
           </div>
 
