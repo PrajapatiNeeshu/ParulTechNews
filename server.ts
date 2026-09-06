@@ -42,6 +42,33 @@ async function startServer() {
     });
   });
 
+  app.post("/api/gemini/discover-trends", async (req, res) => {
+    try {
+      const { category = "Technology" } = req.body;
+      const ai = getGeminiClient();
+      if (!ai) {
+        return res.json([
+          { title: "Enterprise AI agents and the new digital workforce", angle: "Explain the business impact, use cases, risks, and what leaders should do next.", category: "AI", keywords: ["enterprise AI", "AI agents", "digital workforce"], sourceType: "Editorial trend brief" },
+          { title: "AI-powered cybersecurity teams are changing incident response", angle: "Cover how security teams use agents for detection, triage, and human-approved response.", category: "Cyber Security", keywords: ["AI cybersecurity", "incident response", "security automation"], sourceType: "Editorial trend brief" },
+          { title: "The next wave of AI tools for software development", angle: "Compare coding agents, review workflows, testing, and the skills developers need.", category: "Technology", keywords: ["AI coding agents", "developer tools", "software development"], sourceType: "Editorial trend brief" },
+          { title: "AI automation and productivity in small businesses", angle: "Give practical examples of affordable AI workflows for teams and founders.", category: "Business", keywords: ["AI automation", "small business AI", "productivity"], sourceType: "Editorial trend brief" }
+        ]);
+      }
+      const response = await ai.models.generateContent({
+        model: "gemini-3.7-flash",
+        contents: `Find four timely, publishable ${category} news/blog topics for an editorial team. Return only a JSON array with title, angle, category, keywords (array), and sourceType. Prefer verifiable developments, product launches, research, policy, or business trends. Do not invent specific facts.`,
+        config: {
+          responseMimeType: "application/json",
+          tools: [{ googleSearch: {} }],
+        },
+      });
+      res.json(JSON.parse(response.text || "[]"));
+    } catch (err: any) {
+      console.error("Trend discovery error:", err);
+      res.status(500).json({ error: err.message || "Trend discovery failed" });
+    }
+  });
+
   // AI Route: Generate Complete Blog / News Article
   app.post("/api/gemini/generate-blog", async (req, res) => {
     try {

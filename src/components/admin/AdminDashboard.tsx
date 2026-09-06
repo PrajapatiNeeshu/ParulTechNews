@@ -144,8 +144,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   const handleCreateFromAi = (articleData: Partial<Article>) => {
-    onCreateArticle(articleData);
-    setActiveTab('posts');
+    const now = new Date().toISOString();
+    const reviewDraft: Article = {
+      id: `draft-${Date.now()}`,
+      title: articleData.title || 'AI Draft',
+      slug: articleData.slug || `ai-draft-${Date.now()}`,
+      excerpt: articleData.excerpt || '',
+      content: articleData.content || '',
+      contentHtml: articleData.contentHtml,
+      contentMarkdown: articleData.contentMarkdown || articleData.content || '',
+      category: articleData.category || 'Technology',
+      subCategory: articleData.subCategory,
+      tags: articleData.tags || ['AI', 'News'],
+      featuredImage: articleData.featuredImage || '',
+      inshortsSummary: articleData.inshortsSummary || articleData.excerpt || '',
+      author: { id: currentUser.id, name: currentUser.name, role: currentUser.role, avatar: currentUser.avatar },
+      publishedAt: now,
+      updatedAt: now,
+      readTimeMinutes: articleData.readTimeMinutes || 4,
+      views: 0,
+      likes: 0,
+      status: 'draft',
+      isTrending: true,
+      isBreaking: false,
+      isEditorPick: false,
+      seo: articleData.seo || { metaTitle: articleData.title || '', metaDescription: articleData.excerpt || '', focusKeywords: articleData.tags || ['AI'], seoScore: 0, schemaType: 'NewsArticle' },
+      comments: [],
+    };
+    setEditingArticle(reviewDraft);
+    navigateToTab('editor');
   };
 
   const handleSaveSettings = (e: React.FormEvent) => {
@@ -277,7 +304,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <span className="text-[10px] font-mono uppercase tracking-widest text-white/35">// {activeTab.replace('_', ' ')}</span>
         </div>
         {/* VIEW: OVERVIEW DASHBOARD */}
-        {activeTab === 'overview' && (
+        {false && activeTab === 'overview' && (
           <div className="space-y-6">
             {/* Top Metrics Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -439,6 +466,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </table>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* VIEW: SIMPLE EDITORIAL CONTROL CENTER */}
+        {activeTab === 'overview' && (
+          <div className="mx-auto max-w-6xl space-y-6">
+            <section className="rounded-3xl border border-[#F27D26]/30 bg-[#141414] p-6 shadow-xl sm:p-8">
+              <div className="max-w-3xl">
+                <div className="mb-2 flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#F27D26]"><Sparkles className="h-4 w-4" /> AI editorial workspace</div>
+                <h1 className="text-3xl font-black uppercase tracking-tight text-white sm:text-5xl">Find. Review. Publish.</h1>
+                <p className="mt-3 text-sm leading-relaxed text-white/60">Discover what people are talking about, let AI prepare the first draft, review every claim and edit the story, then publish when you are satisfied.</p>
+                <button type="button" onClick={() => navigateToTab('ai_lab')} className="mt-6 flex items-center gap-2 rounded-full bg-[#F27D26] px-5 py-3 text-xs font-black uppercase tracking-wider text-white shadow-lg transition hover:bg-[#d96a1a]"><Sparkles className="h-4 w-4" /> Find trending stories</button>
+              </div>
+            </section>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-2xl border border-white/10 bg-[#0D0D0D] p-5"><div className="text-[10px] font-mono uppercase text-white/45">// NEEDS REVIEW</div><div className="mt-2 text-3xl font-black text-[#F27D26]">{articles.filter((article) => article.status === 'draft' || article.status === 'in_review').length}</div><p className="mt-1 text-xs text-white/50">AI drafts waiting for your edit</p></div>
+              <div className="rounded-2xl border border-white/10 bg-[#0D0D0D] p-5"><div className="text-[10px] font-mono uppercase text-white/45">// PUBLISHED STORIES</div><div className="mt-2 text-3xl font-black text-white">{articles.filter((article) => article.status === 'published').length}</div><p className="mt-1 text-xs text-white/50">Live articles on your website</p></div>
+              <div className="rounded-2xl border border-white/10 bg-[#0D0D0D] p-5"><div className="text-[10px] font-mono uppercase text-white/45">// MONETIZATION</div><div className="mt-2 text-3xl font-black text-[#00FF41]">Ready</div><p className="mt-1 text-xs text-white/50">AdSense and affiliate slots can be managed below</p></div>
+            </div>
+            <section className="grid gap-4 md:grid-cols-3">
+              {[['1', 'Discover', 'AI finds useful story angles and trending topics.'], ['2', 'Review', 'You edit the title, facts, links, SEO, and formatting.'], ['3', 'Publish', 'Only your approved content goes live and earns revenue.']].map(([step, title, description]) => <div key={step} className="rounded-2xl border border-white/10 bg-[#141414] p-5"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F27D26] text-sm font-black text-white">{step}</span><h3 className="mt-4 text-lg font-black uppercase text-white">{title}</h3><p className="mt-2 text-sm leading-relaxed text-white/55">{description}</p></div>)}
+            </section>
+            <div className="flex flex-wrap gap-3"><button type="button" onClick={() => navigateToTab('posts')} className="rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-xs font-bold uppercase text-white/75 hover:border-[#F27D26] hover:text-[#F27D26]">Manage all posts</button><button type="button" onClick={() => navigateToTab('adsense')} className="rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-xs font-bold uppercase text-white/75 hover:border-[#F27D26] hover:text-[#F27D26]">Open monetization</button></div>
           </div>
         )}
 

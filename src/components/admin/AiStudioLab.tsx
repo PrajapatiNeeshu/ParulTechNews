@@ -12,9 +12,10 @@ import {
   Flame,
   FileText,
   Sliders
+  ,Search, CheckCircle
 } from 'lucide-react';
 import { Category, Article } from '../../types';
-import { geminiService } from '../../services/geminiService';
+import { geminiService, TrendingTopic } from '../../services/geminiService';
 
 interface AiStudioLabProps {
   categories: Category[];
@@ -47,6 +48,27 @@ export const AiStudioLab: React.FC<AiStudioLabProps> = ({
   } | null>(null);
 
   const [copied, setCopied] = useState(false);
+  const [trendingTopics, setTrendingTopics] = useState<TrendingTopic[]>([]);
+  const [isDiscovering, setIsDiscovering] = useState(false);
+  const [discoveryMessage, setDiscoveryMessage] = useState('');
+
+  const handleDiscover = async () => {
+    setIsDiscovering(true);
+    setDiscoveryMessage('Finding current editorial angles...');
+    try {
+      const topics = await geminiService.discoverTrendingTopics(category);
+      setTrendingTopics(topics);
+      setDiscoveryMessage(`${topics.length} story ideas ready for review.`);
+    } finally {
+      setIsDiscovering(false);
+    }
+  };
+
+  const selectTopic = (suggestion: TrendingTopic) => {
+    setTopic(suggestion.title);
+    setCategory(suggestion.category);
+    setDiscoveryMessage('Topic selected. Review the angle, then generate a draft.');
+  };
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +89,9 @@ export const AiStudioLab: React.FC<AiStudioLabProps> = ({
 
       setProgressStep('Generating Google News Schema, focus keywords, and SEO metadata...');
       // Step 2: Generate SEO
-      const seoData = await geminiService.generateSeo(blogData.title, blogData.content, category);
+      const seoData = includeSeo
+        ? await geminiService.generateSeo(blogData.title, blogData.content, category)
+        : { metaTitle: blogData.title, metaDescription: blogData.excerpt, focusKeywords: blogData.focusKeywords || [], googleNewsHeadline: blogData.title, seoScore: 0 };
 
       let inshortsText = blogData.excerpt;
       if (includeInshorts) {
@@ -108,7 +132,7 @@ export const AiStudioLab: React.FC<AiStudioLabProps> = ({
       category: generatedResult.suggestedCategory,
       tags: generatedResult.suggestedTags,
       featuredImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
-      status: 'published',
+      status: 'draft',
       isTrending: true,
       seo: {
         metaTitle: generatedResult.metaTitle,
@@ -144,6 +168,19 @@ export const AiStudioLab: React.FC<AiStudioLabProps> = ({
           <div className="text-[10px] text-white/60 font-mono mt-0.5">● SECURE ZERO-LEAK PROXY</div>
         </div>
       </div>
+
+      <section className="rounded-3xl border border-[#F27D26]/30 bg-[#141414] p-5 shadow-xl">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="mb-1 flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#F27D26]"><Search className="h-4 w-4" /> Step 1: Find a story</div>
+            <h3 className="text-lg font-black uppercase tracking-tight text-white">Discover AI and technology trends</h3>
+            <p className="mt-1 max-w-2xl text-xs text-white/55">Use AI to collect story ideas first. You review the angle, generate a draft, edit it, and publish only when it is ready.</p>
+          </div>
+          <button type="button" onClick={handleDiscover} disabled={isDiscovering} className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#F27D26] px-5 py-3 text-xs font-black uppercase tracking-wider text-white shadow-lg transition hover:bg-[#d96a1a] disabled:opacity-60"><Search className="h-4 w-4" />{isDiscovering ? 'Finding trends...' : 'Find trending stories'}</button>
+        </div>
+        {discoveryMessage && <div className="mt-3 text-[11px] font-mono uppercase text-[#00FF41]">{discoveryMessage}</div>}
+        {trendingTopics.length > 0 && <div className="mt-4 grid gap-3 md:grid-cols-2">{trendingTopics.map((suggestion) => <button type="button" key={suggestion.title} onClick={() => selectTopic(suggestion)} className={`rounded-2xl border p-4 text-left transition ${topic === suggestion.title ? 'border-[#F27D26] bg-[#F27D26]/10' : 'border-white/10 bg-black hover:border-[#F27D26]/60'}`}><div className="flex items-start justify-between gap-3"><div><div className="mb-1 text-[10px] font-mono uppercase text-[#00FF41]">{suggestion.category} • {suggestion.sourceType}</div><div className="text-sm font-black text-white">{suggestion.title}</div></div>{topic === suggestion.title && <CheckCircle className="h-4 w-4 shrink-0 text-[#F27D26]" />}</div><p className="mt-2 text-xs leading-relaxed text-white/55">{suggestion.angle}</p><div className="mt-2 text-[10px] font-mono text-white/35">KEYWORDS: {suggestion.keywords.join(', ')}</div></button>)}</div>}
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Prompt Input Form */}
@@ -301,7 +338,7 @@ export const AiStudioLab: React.FC<AiStudioLabProps> = ({
                     onClick={handlePushToEditor}
                     className="bg-[#00FF41] hover:bg-[#00cc33] text-black text-[10px] font-mono font-bold uppercase px-4 py-1.5 rounded-full flex items-center gap-1.5 transition shadow-lg cursor-pointer"
                   >
-                    <span>Send to Editor</span>
+                    <span>Review in Editor</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>

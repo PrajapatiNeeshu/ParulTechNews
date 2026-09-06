@@ -33,7 +33,35 @@ export interface GeneratedSeoResponse {
   recommendations: string[];
 }
 
+export interface TrendingTopic {
+  title: string;
+  angle: string;
+  category: string;
+  keywords: string[];
+  sourceType: string;
+}
+
 export const geminiService = {
+  async discoverTrendingTopics(category = 'Technology'): Promise<TrendingTopic[]> {
+    try {
+      const res = await fetch('/api/gemini/discover-trends', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category }),
+      });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      console.warn('Trend discovery fallback:', err);
+      return [
+        { title: 'Enterprise AI agents and the new digital workforce', angle: 'Explain the business impact, use cases, risks, and what leaders should do next.', category: 'AI', keywords: ['enterprise AI', 'AI agents', 'digital workforce'], sourceType: 'Editorial trend brief' },
+        { title: 'AI-powered cybersecurity teams are changing incident response', angle: 'Cover how security teams use agents for detection, triage, and human-approved response.', category: 'Cyber Security', keywords: ['AI cybersecurity', 'incident response', 'security automation'], sourceType: 'Editorial trend brief' },
+        { title: 'The next wave of AI tools for software development', angle: 'Compare coding agents, review workflows, testing, and the skills developers need.', category: 'Technology', keywords: ['AI coding agents', 'developer tools', 'software development'], sourceType: 'Editorial trend brief' },
+        { title: 'AI automation and productivity in small businesses', angle: 'Give practical examples of affordable AI workflows for teams and founders.', category: 'Business', keywords: ['AI automation', 'small business AI', 'productivity'], sourceType: 'Editorial trend brief' },
+      ];
+    }
+  },
+
   /**
    * Generates a complete, journalistic news/blog article
    */

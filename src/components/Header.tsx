@@ -13,7 +13,9 @@ import {
   CloudSun,
   Globe,
   Sun,
-  Moon
+  Moon,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Category, User, ActiveTab, RoleType, ThemeMode } from '../types';
 
@@ -51,6 +53,32 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleTheme,
 }) => {
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = React.useState(false);
+  const roleSwitcherRef = React.useRef<HTMLDivElement>(null);
+  const categoryScrollerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handlePointerDown = (event: PointerEvent) => {
+      if (roleSwitcherRef.current && !roleSwitcherRef.current.contains(event.target as Node)) {
+        setIsRoleDropdownOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsRoleDropdownOpen(false);
+    };
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  const scrollCategories = (direction: 'left' | 'right') => {
+    categoryScrollerRef.current?.scrollBy({
+      left: direction === 'right' ? 280 : -280,
+      behavior: 'smooth',
+    });
+  };
 
   // Format today's date
   const todayFormatted = new Intl.DateTimeFormat('en-US', {
@@ -126,7 +154,7 @@ export const Header: React.FC<HeaderProps> = ({
             )}
 
             {/* RBAC Role Switcher */}
-            <div className="relative">
+            <div ref={roleSwitcherRef} className="relative">
               <button
                 onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
                 className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border font-medium transition cursor-pointer ${
@@ -401,7 +429,21 @@ export const Header: React.FC<HeaderProps> = ({
       <div className={`border-t transition-colors duration-200 ${
         isDark ? 'border-white/10 bg-black/60' : 'border-zinc-200 bg-zinc-50/90'
       }`}>
-        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth text-xs">
+        <div className="relative max-w-7xl mx-auto px-10 sm:px-12">
+          <button
+            type="button"
+            onClick={() => scrollCategories('left')}
+            className={`absolute left-1 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border shadow-sm transition ${
+              isDark
+                ? 'border-white/20 bg-[#111111] text-white hover:border-[#F27D26] hover:text-[#F27D26]'
+                : 'border-zinc-300 bg-white text-zinc-700 hover:border-[#F27D26] hover:text-[#F27D26]'
+            }`}
+            title="Scroll categories left"
+            aria-label="Scroll categories left"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <div ref={categoryScrollerRef} className="flex items-center gap-1.5 overflow-x-auto py-2 no-scrollbar scroll-smooth text-xs">
           <button
             onClick={() => onSelectCategory(null)}
             className={`px-3.5 py-1 rounded-full whitespace-nowrap font-black uppercase text-[11px] tracking-wider transition cursor-pointer shrink-0 border ${
@@ -442,6 +484,20 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             );
           })}
+          </div>
+          <button
+            type="button"
+            onClick={() => scrollCategories('right')}
+            className={`absolute right-1 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border shadow-sm transition ${
+              isDark
+                ? 'border-white/20 bg-[#111111] text-white hover:border-[#F27D26] hover:text-[#F27D26]'
+                : 'border-zinc-300 bg-white text-zinc-700 hover:border-[#F27D26] hover:text-[#F27D26]'
+            }`}
+            title="Scroll categories right"
+            aria-label="Scroll categories right"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </header>
