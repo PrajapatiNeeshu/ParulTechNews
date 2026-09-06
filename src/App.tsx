@@ -5,7 +5,8 @@ import {
   User, 
   AdUnit, 
   MediaItem, 
-  RoleType 
+  RoleType,
+  ThemeMode
 } from './types';
 import { 
   MOCK_CATEGORIES, 
@@ -55,6 +56,32 @@ export default function App() {
   const [currentView, setCurrentView] = useState<'website' | 'inshorts' | 'admin'>('website');
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null);
   const [readingArticle, setReadingArticle] = useState<Article | null>(null);
+
+  // Theme State: 'dark' (Obsidian) | 'light' (High-Contrast Light)
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    const saved = localStorage.getItem('presscore_theme');
+    return (saved === 'light' || saved === 'dark') ? saved : 'dark';
+  });
+
+  // Sync theme with DOM and localStorage
+  useEffect(() => {
+    localStorage.setItem('presscore_theme', theme);
+    if (theme === 'light') {
+      document.documentElement.classList.add('light');
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.body.classList.add('light');
+      document.body.classList.remove('bg-[#050505]', 'text-white');
+    } else {
+      document.documentElement.classList.remove('light');
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.body.classList.remove('light');
+      document.body.classList.add('bg-[#050505]', 'text-white');
+    }
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   // Modals & Drawers
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -251,12 +278,17 @@ export default function App() {
     );
   }
 
+  const isDark = theme === 'dark';
+
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans flex flex-col justify-between selection:bg-[#F27D26] selection:text-white">
+    <div className={`min-h-screen font-sans flex flex-col justify-between transition-colors duration-200 selection:bg-[#F27D26] selection:text-white ${
+      isDark ? 'bg-[#050505] text-white' : 'bg-[#F4F5F7] text-zinc-950'
+    }`}>
       {/* 1. Top Real-Time Breaking News Ticker */}
       <BreakingTicker
         articles={articles}
         onSelectArticle={handleSelectArticle}
+        theme={theme}
       />
 
       {/* 2. Global Header Navigation */}
@@ -285,6 +317,8 @@ export default function App() {
         currentUser={currentUser}
         allUsers={users}
         onSwitchUser={handleSwitchUser}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* 3. Main View Area */}
@@ -301,6 +335,7 @@ export default function App() {
             isBookmarked={bookmarkedIds.includes(readingArticle.id)}
             onToggleBookmark={handleToggleBookmark}
             onOpenWhatsAppShare={handleOpenWhatsAppShare}
+            theme={theme}
           />
         ) : currentView === 'inshorts' ? (
           /* VIEW B: Inshorts 60-Second Flash Card Feed */
@@ -311,30 +346,47 @@ export default function App() {
             onOpenWhatsAppShare={handleOpenWhatsAppShare}
             isBookmarked={(id) => bookmarkedIds.includes(id)}
             onToggleBookmark={handleToggleBookmark}
+            theme={theme}
           />
         ) : (
           /* VIEW C: Default News Website Homepage */
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
             {/* Top Billboard AdSense Placement */}
-            <div className="bg-slate-50 border border-gray-200 rounded-3xl p-3 text-center">
-              <div className="text-[10px] uppercase font-mono font-bold text-[#F27D26] tracking-[0.2em] mb-1.5">
+            <div className={`rounded-3xl p-3 text-center border transition-colors ${
+              isDark ? 'bg-[#0D0D0D] border-white/10' : 'bg-white border-zinc-300 shadow-sm'
+            }`}>
+              <div className={`text-[10px] uppercase font-mono font-bold tracking-[0.2em] mb-1.5 ${
+                isDark ? 'text-[#00FF41]' : 'text-emerald-700'
+              }`}>
                 // SPONSORED BILLBOARD • LEADERBOARD 728X90
               </div>
-              <div className="bg-gray-50 text-gray-900 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-gray-300">
+              <div className={`p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border ${
+                isDark ? 'bg-black text-white border-white/10' : 'bg-zinc-50 text-zinc-900 border-zinc-200'
+              }`}>
                 <div className="flex items-center gap-3 text-left">
                   <span className="px-2.5 py-1 bg-[#F27D26] text-white rounded-full font-black text-xs uppercase tracking-wider">
                     CLOUD ENGINE
                   </span>
                   <div>
-                    <div className="text-sm font-black uppercase tracking-tight text-gray-900">Google Cloud Vertex AI Enterprise Suite</div>
-                    <div className="text-xs text-gray-600 font-mono">Deploy high-performance multimodal models with zero latency overhead.</div>
+                    <div className={`text-sm font-black uppercase tracking-tight ${
+                      isDark ? 'text-white' : 'text-zinc-950'
+                    }`}>
+                      Google Cloud Vertex AI Enterprise Suite
+                    </div>
+                    <div className={`text-xs font-mono ${
+                      isDark ? 'text-white/60' : 'text-zinc-600'
+                    }`}>
+                      Deploy high-performance multimodal models with zero latency overhead.
+                    </div>
                   </div>
                 </div>
                 <a
                   href="https://cloud.google.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-[#F27D26] hover:bg-orange-600 text-white hover:text-white text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition shrink-0"
+                  className={`text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition shrink-0 ${
+                    isDark ? 'bg-white hover:bg-[#F27D26] text-black hover:text-white' : 'bg-black hover:bg-[#F27D26] text-white'
+                  }`}
                 >
                   Explore Free Tier
                 </a>
@@ -343,16 +395,22 @@ export default function App() {
 
             {/* Category Title Heading (if filtered) */}
             {selectedCategorySlug && (
-              <div className="flex items-center justify-between pb-4 border-b border-gray-200">
+              <div className={`flex items-center justify-between pb-4 border-b ${
+                isDark ? 'border-white/10' : 'border-zinc-300'
+              }`}>
                 <div className="flex items-center gap-3">
                   <span className="w-3 h-3 rounded-full bg-[#F27D26]"></span>
-                  <h1 className="text-3xl font-black uppercase tracking-tighter text-gray-900">
+                  <h1 className={`text-3xl font-black uppercase tracking-tighter ${
+                    isDark ? 'text-white' : 'text-zinc-950'
+                  }`}>
                     {selectedCategorySlug.replace('-', ' ')} STORIES
                   </h1>
                 </div>
                 <button
                   onClick={() => setSelectedCategorySlug(null)}
-                  className="text-xs font-mono font-bold text-[#F27D26] uppercase tracking-wider hover:underline"
+                  className={`text-xs font-mono font-bold uppercase tracking-wider hover:underline cursor-pointer ${
+                    isDark ? 'text-[#00FF41]' : 'text-emerald-700'
+                  }`}
                 >
                   Clear filter // View all
                 </button>
@@ -371,9 +429,12 @@ export default function App() {
                     isBookmarked={bookmarkedIds.includes(leadHeroArticle.id)}
                     onToggleBookmark={handleToggleBookmark}
                     onOpenWhatsAppShare={handleOpenWhatsAppShare}
+                    theme={theme}
                   />
                 ) : (
-                  <div className="p-12 text-center text-gray-500 bg-slate-50 rounded-3xl border border-gray-200 font-mono">
+                  <div className={`p-12 text-center rounded-3xl border font-mono ${
+                    isDark ? 'text-white/40 bg-[#0D0D0D] border-white/10' : 'text-zinc-500 bg-white border-zinc-300 shadow-sm'
+                  }`}>
                     No stories found in this category.
                   </div>
                 )}
@@ -381,13 +442,19 @@ export default function App() {
 
               {/* Right: Trending Now Sidebar (4 Cols) */}
               <aside className="lg:col-span-4 space-y-6">
-                <div className="bg-slate-50 p-6 rounded-3xl border border-gray-200 shadow-md">
-                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-gray-200">
+                <div className={`p-6 rounded-3xl border shadow-2xl transition-colors ${
+                  isDark ? 'bg-[#0D0D0D] border-white/10' : 'bg-white border-zinc-300 shadow-md'
+                }`}>
+                  <div className={`flex items-center justify-between pb-3 mb-4 border-b ${
+                    isDark ? 'border-white/10' : 'border-zinc-200'
+                  }`}>
                     <div className="flex items-center gap-2 text-[#F27D26] font-black text-xs uppercase tracking-widest">
                       <Flame className="w-4 h-4" />
                       <span>TRENDING NOW</span>
                     </div>
-                    <span className="text-[10px] text-gray-600 font-mono uppercase">REAL-TIME VIEWS</span>
+                    <span className={`text-[10px] font-mono uppercase ${
+                      isDark ? 'text-white/40' : 'text-zinc-500'
+                    }`}>REAL-TIME VIEWS</span>
                   </div>
 
                   <div className="space-y-3">
@@ -400,26 +467,27 @@ export default function App() {
                         isBookmarked={bookmarkedIds.includes(art.id)}
                         onToggleBookmark={handleToggleBookmark}
                         onOpenWhatsAppShare={handleOpenWhatsAppShare}
+                        theme={theme}
                       />
                     ))}
                   </div>
                 </div>
 
                 {/* Inshorts 60s Fast Pitch Box */}
-                <div className="bg-[#F27D26] text-white p-6 rounded-3xl shadow-md relative overflow-hidden">
-                  <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white mb-2">
+                <div className="bg-[#F27D26] text-white p-6 rounded-3xl shadow-2xl relative overflow-hidden">
+                  <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white/90 mb-2">
                     <Zap className="w-4 h-4" />
                     <span>INSHORTS FAST MODE</span>
                   </div>
                   <h3 className="font-black text-2xl uppercase tracking-tight leading-tight mb-2">
                     CATCH UP ON 10 STORIES IN 3 MINUTES
                   </h3>
-                  <p className="text-xs text-white leading-relaxed mb-5 font-medium">
+                  <p className="text-xs text-white/90 leading-relaxed mb-5 font-medium">
                     Experience bite-sized 60-word briefs with neural voice playback and 1-click WhatsApp digests.
                   </p>
                   <button
                     onClick={() => setCurrentView('inshorts')}
-                    className="w-full bg-white text-[#F27D26] hover:bg-gray-100 hover:text-orange-600 text-xs font-black uppercase tracking-wider py-3 rounded-full transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                    className="w-full bg-black text-white hover:bg-white hover:text-black text-xs font-black uppercase tracking-wider py-3 rounded-full transition flex items-center justify-center gap-2 cursor-pointer shadow-lg"
                   >
                     <span>Launch 60s Flash Feed</span>
                     <ChevronRight className="w-4 h-4" />
@@ -430,14 +498,20 @@ export default function App() {
 
             {/* Latest Editorial Feed Grid */}
             <section className="space-y-6 pt-6">
-              <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+              <div className={`flex items-center justify-between pb-3 border-b ${
+                isDark ? 'border-white/10' : 'border-zinc-300'
+              }`}>
                 <div className="flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#F27D26] animate-pulse"></span>
-                  <h2 className="text-2xl font-black uppercase tracking-tight text-gray-900">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#00FF41] animate-pulse"></span>
+                  <h2 className={`text-2xl font-black uppercase tracking-tight ${
+                    isDark ? 'text-white' : 'text-zinc-950'
+                  }`}>
                     LATEST EDITORIAL STORIES &amp; REPORTS
                   </h2>
                 </div>
-                <div className="text-xs font-mono text-gray-500 uppercase">
+                <div className={`text-xs font-mono uppercase ${
+                  isDark ? 'text-white/40' : 'text-zinc-500'
+                }`}>
                   [{gridArticles.length} STORIES PUBLISHED]
                 </div>
               </div>
@@ -452,6 +526,7 @@ export default function App() {
                     isBookmarked={bookmarkedIds.includes(art.id)}
                     onToggleBookmark={handleToggleBookmark}
                     onOpenWhatsAppShare={handleOpenWhatsAppShare}
+                    theme={theme}
                   />
                 ))}
               </div>
@@ -473,6 +548,7 @@ export default function App() {
           setWhatsAppArticle(publishedArticles[0]);
           setIsWhatsAppModalOpen(true);
         }}
+        theme={theme}
       />
 
       {/* 5. Modals and Overlays */}
@@ -490,6 +566,7 @@ export default function App() {
         bookmarkedArticles={bookmarkedArticlesList}
         onSelectArticle={handleSelectArticle}
         onRemoveBookmark={handleToggleBookmark}
+        theme={theme}
       />
 
       <WhatsAppShareModal

@@ -13,7 +13,7 @@ import {
   Flame,
   Filter
 } from 'lucide-react';
-import { Article, Category } from '../types';
+import { Article, Category, ThemeMode } from '../types';
 
 interface InshortsViewProps {
   articles: Article[];
@@ -22,6 +22,7 @@ interface InshortsViewProps {
   onOpenWhatsAppShare: (article: Article) => void;
   isBookmarked: (id: string) => boolean;
   onToggleBookmark: (id: string) => void;
+  theme?: ThemeMode;
 }
 
 export const InshortsView: React.FC<InshortsViewProps> = ({
@@ -31,7 +32,9 @@ export const InshortsView: React.FC<InshortsViewProps> = ({
   onOpenWhatsAppShare,
   isBookmarked,
   onToggleBookmark,
+  theme = 'dark',
 }) => {
+  const isDark = theme === 'dark';
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
@@ -86,10 +89,10 @@ export const InshortsView: React.FC<InshortsViewProps> = ({
   if (!currentArticle) {
     return (
       <div className="max-w-md mx-auto py-16 text-center px-4">
-        <p className="text-slate-500 text-sm">No stories available in this category.</p>
+        <p className={isDark ? 'text-white/50 text-sm' : 'text-zinc-600 text-sm'}>No stories available in this category.</p>
         <button
           onClick={() => setSelectedCategory(null)}
-          className="mt-3 text-xs text-indigo-600 font-bold hover:underline"
+          className={`mt-3 text-xs font-bold hover:underline ${isDark ? 'text-[#00FF41]' : 'text-emerald-700'}`}
         >
           View all stories
         </button>
@@ -111,12 +114,18 @@ export const InshortsView: React.FC<InshortsViewProps> = ({
             <Zap className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-xl font-black uppercase tracking-tight text-white">Inshorts 60s Flash Feed</h2>
-            <p className="text-xs font-mono text-white/50 uppercase">// CONCISE, FACT-VERIFIED BRIEFS UNDER 60 WORDS</p>
+            <h2 className={`text-xl font-black uppercase tracking-tight ${isDark ? 'text-white' : 'text-zinc-950'}`}>
+              Inshorts 60s Flash Feed
+            </h2>
+            <p className={`text-xs font-mono uppercase ${isDark ? 'text-white/50' : 'text-zinc-500 font-semibold'}`}>
+              // CONCISE, FACT-VERIFIED BRIEFS UNDER 60 WORDS
+            </p>
           </div>
         </div>
 
-        <div className="text-xs font-mono font-bold text-[#00FF41] bg-[#111111] border border-white/10 px-3 py-1.5 rounded-full">
+        <div className={`text-xs font-mono font-bold border px-3 py-1.5 rounded-full ${
+          isDark ? 'text-[#00FF41] bg-[#111111] border-white/10' : 'text-emerald-700 bg-white border-zinc-300 shadow-2xs'
+        }`}>
           STORY [{currentIndex + 1}/{filteredArticles.length}]
         </div>
       </div>
@@ -125,8 +134,10 @@ export const InshortsView: React.FC<InshortsViewProps> = ({
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-6 text-xs">
         <button
           onClick={() => { setSelectedCategory(null); setCurrentIndex(0); }}
-          className={`px-4 py-1.5 rounded-full whitespace-nowrap font-black uppercase text-[11px] tracking-wider transition cursor-pointer shrink-0 ${
-            selectedCategory === null ? 'bg-white text-black shadow-lg' : 'bg-[#111111] border border-white/10 text-white/60 hover:text-white'
+          className={`px-4 py-1.5 rounded-full whitespace-nowrap font-black uppercase text-[11px] tracking-wider transition cursor-pointer shrink-0 border ${
+            selectedCategory === null 
+              ? (isDark ? 'bg-white text-black border-white shadow-lg' : 'bg-black text-white border-black shadow-lg') 
+              : (isDark ? 'bg-[#111111] border-white/10 text-white/60 hover:text-white' : 'bg-white border-zinc-300 text-zinc-700 hover:text-black')
           }`}
         >
           All ({articles.length})
@@ -136,7 +147,9 @@ export const InshortsView: React.FC<InshortsViewProps> = ({
             key={cat.id}
             onClick={() => { setSelectedCategory(cat.slug); setCurrentIndex(0); }}
             className={`px-4 py-1.5 rounded-full whitespace-nowrap font-bold uppercase text-[11px] tracking-wider transition cursor-pointer shrink-0 border ${
-              selectedCategory === cat.slug ? 'bg-white text-black border-white shadow-lg' : 'bg-[#111111] border-white/10 text-white/60 hover:text-white'
+              selectedCategory === cat.slug 
+                ? (isDark ? 'bg-white text-black border-white shadow-lg' : 'bg-black text-white border-black shadow-lg') 
+                : (isDark ? 'bg-[#111111] border-white/10 text-white/60 hover:text-white' : 'bg-white border-zinc-300 text-zinc-700 hover:text-black')
             }`}
           >
             {cat.name}
@@ -145,7 +158,9 @@ export const InshortsView: React.FC<InshortsViewProps> = ({
       </div>
 
       {/* Main Inshorts Card */}
-      <div className="bg-[#0D0D0D] rounded-3xl border border-white/15 shadow-2xl overflow-hidden relative flex flex-col transition-all duration-300">
+      <div className={`rounded-3xl border shadow-2xl overflow-hidden relative flex flex-col transition-all duration-300 ${
+        isDark ? 'bg-[#0D0D0D] border-white/15 text-white' : 'bg-white border-zinc-200 text-zinc-900 shadow-md'
+      }`}>
         {/* Cover Photo */}
         <div className="relative aspect-[16/9] bg-black overflow-hidden">
           <img
@@ -153,7 +168,7 @@ export const InshortsView: React.FC<InshortsViewProps> = ({
             alt={currentArticle.title}
             className="w-full h-full object-cover opacity-90"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-[#0D0D0D]/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
 
           <div className="absolute top-4 left-4 flex gap-2">
             {currentArticle.isBreaking && (
@@ -176,27 +191,35 @@ export const InshortsView: React.FC<InshortsViewProps> = ({
         {/* 60-Word Summary Body */}
         <div className="p-6 flex-1 flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between text-xs font-mono text-white/40 mb-4 pb-3 border-b border-white/10">
-              <span className="font-bold text-white uppercase">{currentArticle.author.name}</span>
+            <div className={`flex items-center justify-between text-xs font-mono mb-4 pb-3 border-b ${
+              isDark ? 'border-white/10 text-white/40' : 'border-zinc-200 text-zinc-500'
+            }`}>
+              <span className={`font-bold uppercase ${isDark ? 'text-white' : 'text-zinc-950'}`}>{currentArticle.author.name}</span>
               <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3 text-[#00FF41]" />
+                <Clock className={`w-3 h-3 ${isDark ? 'text-[#00FF41]' : 'text-emerald-700'}`} />
                 {formattedDate} • 60-WORD BRIEF
               </span>
             </div>
 
-            <p className="text-white/80 text-base sm:text-lg leading-relaxed mb-6 font-normal">
+            <p className={`text-base sm:text-lg leading-relaxed mb-6 font-normal ${
+              isDark ? 'text-white/80' : 'text-zinc-700'
+            }`}>
               {currentArticle.inshortsSummary || currentArticle.excerpt}
             </p>
           </div>
 
           <div>
             {/* Card Action Controls */}
-            <div className="flex items-center justify-between pt-4 border-t border-white/10">
+            <div className={`flex items-center justify-between pt-4 border-t ${
+              isDark ? 'border-white/10' : 'border-zinc-200'
+            }`}>
               <div className="flex items-center gap-2">
                 <button
                   onClick={toggleSpeech}
                   className={`px-3.5 py-2 rounded-full text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-1.5 transition cursor-pointer ${
-                    isPlayingAudio ? 'bg-[#F27D26] text-white animate-pulse' : 'bg-[#1a1a1a] hover:bg-[#222222] text-white/80'
+                    isPlayingAudio 
+                      ? 'bg-[#F27D26] text-white animate-pulse' 
+                      : (isDark ? 'bg-[#1a1a1a] hover:bg-[#222222] text-white/80' : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800')
                   }`}
                   title={isPlayingAudio ? 'Stop Voice' : 'Listen with Audio Voice'}
                 >
@@ -206,7 +229,9 @@ export const InshortsView: React.FC<InshortsViewProps> = ({
 
                 <button
                   onClick={() => onOpenWhatsAppShare(currentArticle)}
-                  className="p-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-full transition cursor-pointer"
+                  className={`p-2.5 rounded-full transition cursor-pointer ${
+                    isDark ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700'
+                  }`}
                   title="Share to WhatsApp"
                 >
                   <Share2 className="w-4 h-4" />
@@ -215,7 +240,9 @@ export const InshortsView: React.FC<InshortsViewProps> = ({
                 <button
                   onClick={() => onToggleBookmark(currentArticle.id)}
                   className={`p-2.5 rounded-full transition cursor-pointer ${
-                    isBookmarked(currentArticle.id) ? 'bg-[#F27D26]/20 text-[#F27D26]' : 'bg-[#1a1a1a] hover:bg-[#222222] text-white/60'
+                    isBookmarked(currentArticle.id) 
+                      ? 'bg-[#F27D26]/20 text-[#F27D26]' 
+                      : (isDark ? 'bg-[#1a1a1a] hover:bg-[#222222] text-white/60' : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-600')
                   }`}
                   title="Bookmark"
                 >
@@ -225,7 +252,11 @@ export const InshortsView: React.FC<InshortsViewProps> = ({
 
               <button
                 onClick={() => onSelectArticle(currentArticle)}
-                className="bg-white hover:bg-[#F27D26] text-black hover:text-white text-xs font-black uppercase tracking-wider px-4 py-2.5 rounded-full flex items-center gap-1.5 transition cursor-pointer shadow-lg"
+                className={`text-xs font-black uppercase tracking-wider px-4 py-2.5 rounded-full flex items-center gap-1.5 transition cursor-pointer shadow-lg ${
+                  isDark 
+                    ? 'bg-white hover:bg-[#F27D26] text-black hover:text-white' 
+                    : 'bg-black hover:bg-[#F27D26] text-white hover:text-white'
+                }`}
               >
                 <span>Read Full Story</span>
                 <ArrowUpRight className="w-3.5 h-3.5" />
@@ -242,8 +273,8 @@ export const InshortsView: React.FC<InshortsViewProps> = ({
           disabled={currentIndex === 0}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition shadow-lg cursor-pointer ${
             currentIndex === 0
-              ? 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
-              : 'bg-[#111111] border border-white/20 text-white hover:bg-white hover:text-black'
+              ? (isDark ? 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed' : 'bg-zinc-100 text-zinc-300 border border-zinc-200 cursor-not-allowed')
+              : (isDark ? 'bg-[#111111] border border-white/20 text-white hover:bg-white hover:text-black' : 'bg-white border border-zinc-300 text-zinc-900 hover:bg-zinc-900 hover:text-white shadow-2xs')
           }`}
         >
           <ChevronUp className="w-4 h-4" />
@@ -255,8 +286,8 @@ export const InshortsView: React.FC<InshortsViewProps> = ({
           disabled={currentIndex >= filteredArticles.length - 1}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition shadow-lg cursor-pointer ${
             currentIndex >= filteredArticles.length - 1
-              ? 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
-              : 'bg-white text-black hover:bg-[#F27D26] hover:text-white'
+              ? (isDark ? 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed' : 'bg-zinc-100 text-zinc-300 border border-zinc-200 cursor-not-allowed')
+              : (isDark ? 'bg-white text-black hover:bg-[#F27D26] hover:text-white' : 'bg-black text-white hover:bg-[#F27D26] hover:text-white')
           }`}
         >
           <span>Next Story</span>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Share2, Check, Copy, ExternalLink, MessageCircle, Sparkles } from 'lucide-react';
-import { Article } from '../types';
+import { Article } from './types';
 
 interface WhatsAppShareModalProps {
   article: Article | null;

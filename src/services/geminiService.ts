@@ -156,6 +156,32 @@ export const geminiService = {
   },
 
   /**
+   * Checks an article against current search-grounding data when available.
+   */
+  async factCheckArticle(title: string, content: string): Promise<import('../types').FactCheckResult> {
+    try {
+      const res = await fetch('/api/gemini/fact-check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, content }),
+      });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      console.warn('Fact-check fallback:', err);
+      return {
+        verdict: 'Developing / Context Needed',
+        confidence: 0.5,
+        analysis: 'Live fact-checking is unavailable. Review the article against the cited sources before publication.',
+        sources: [],
+        searchQueries: [title],
+        model: 'local-fallback',
+        timestamp: new Date().toISOString(),
+      };
+    }
+  },
+
+  /**
    * Automatically detects category and suggests tags
    */
   async detectCategory(title: string, content: string) {

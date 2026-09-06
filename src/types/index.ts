@@ -48,6 +48,11 @@ export interface Comment {
   replies?: Comment[];
 }
 
+export interface GroundingSource {
+  title: string;
+  uri: string;
+}
+
 export interface Article {
   id: string;
   title: string;
@@ -81,7 +86,29 @@ export interface Article {
   isTrending?: boolean;
   isEditorPick?: boolean;
   isSponsored?: boolean;
+  groundingSources?: GroundingSource[];
+  searchQueries?: string[];
   comments: Comment[];
+}
+
+export interface GroundedSearchResult {
+  query: string;
+  answer: string;
+  sources: GroundingSource[];
+  searchQueries: string[];
+  model: string;
+  timestamp: string;
+  isFallback?: boolean;
+}
+
+export interface FactCheckResult {
+  verdict: 'Verified & Current' | 'Developing / Context Needed' | 'Disputed / Outdated';
+  confidence?: number;
+  analysis: string;
+  sources: { title: string; uri: string }[];
+  searchQueries: string[];
+  model: string;
+  timestamp: string;
 }
 
 export interface AdUnit {
@@ -151,6 +178,7 @@ export interface NotificationJob {
   openRate?: string;
 }
 
+export type ThemeMode = 'dark' | 'light';
 export type ActiveTab = 'portal' | 'inshorts' | 'admin' | 'ai-lab';
 
 export type AdminSubView = 

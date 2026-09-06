@@ -11,9 +11,11 @@ import {
   ChevronDown, 
   TrendingUp,
   CloudSun,
-  Globe
+  Globe,
+  Sun,
+  Moon
 } from 'lucide-react';
-import { Category, User, ActiveTab, RoleType } from '../types';
+import { Category, User, ActiveTab, RoleType, ThemeMode } from '../types';
 
 interface HeaderProps {
   categories: Category[];
@@ -28,6 +30,8 @@ interface HeaderProps {
   onOpenBookmarks: () => void;
   onOpenWhatsAppModal: () => void;
   bookmarksCount: number;
+  theme?: ThemeMode;
+  onToggleTheme?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -43,6 +47,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenBookmarks,
   onOpenWhatsAppModal,
   bookmarksCount,
+  theme = 'dark',
+  onToggleTheme,
 }) => {
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = React.useState(false);
 
@@ -54,44 +60,98 @@ export const Header: React.FC<HeaderProps> = ({
     year: 'numeric',
   }).format(new Date());
 
+  const isDark = theme === 'dark';
+
   return (
-    <header className="sticky top-0 z-40 bg-[#050505]/95 backdrop-blur-md border-b border-white/10 shadow-2xl">
+    <header className={`sticky top-0 z-40 backdrop-blur-md transition-colors duration-200 ${
+      isDark 
+        ? 'bg-[#050505]/95 border-b border-white/10 shadow-2xl text-white' 
+        : 'bg-white/95 border-b border-zinc-200 shadow-sm text-zinc-950'
+    }`}>
       {/* Top utility sub-bar */}
-      <div className="bg-black text-white/70 text-xs py-1.5 px-4 border-b border-white/10 hidden sm:block">
+      <div className={`text-xs py-1.5 px-4 border-b hidden sm:block transition-colors duration-200 ${
+        isDark 
+          ? 'bg-black text-white/70 border-white/10' 
+          : 'bg-zinc-100 text-zinc-600 border-zinc-200'
+      }`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#00FF41] animate-pulse"></span>
-              <span className="text-[#00FF41] font-mono text-[11px] uppercase tracking-[0.25em] font-bold">SYSTEM: STABLE</span>
+              <span className={`w-2 h-2 rounded-full animate-pulse ${isDark ? 'bg-[#00FF41]' : 'bg-emerald-600'}`}></span>
+              <span className={`font-mono text-[11px] uppercase tracking-[0.25em] font-bold ${
+                isDark ? 'text-[#00FF41]' : 'text-emerald-700'
+              }`}>
+                SYSTEM: STABLE
+              </span>
             </div>
-            <span className="text-white/20">|</span>
-            <span className="font-mono text-white/50 text-[11px] uppercase tracking-wider">{todayFormatted}</span>
-            <span className="text-white/20">|</span>
+            <span className={isDark ? 'text-white/20' : 'text-zinc-300'}>|</span>
+            <span className={`font-mono text-[11px] uppercase tracking-wider ${
+              isDark ? 'text-white/50' : 'text-zinc-500'
+            }`}>
+              {todayFormatted}
+            </span>
+            <span className={isDark ? 'text-white/20' : 'text-zinc-300'}>|</span>
             <div className="flex items-center gap-2 text-[11px] font-mono">
-              <span className="text-[#00FF41] font-bold">S&P 500 ▲ 5,648.40 (+0.4%)</span>
-              <span className="text-white/20">•</span>
-              <span className="text-[#00FF41] font-bold">NASDAQ ▲ 17,870 (+0.7%)</span>
+              <span className={isDark ? 'text-[#00FF41] font-bold' : 'text-emerald-700 font-bold'}>S&amp;P 500 ▲ 5,648.40 (+0.4%)</span>
+              <span className={isDark ? 'text-white/20' : 'text-zinc-300'}>•</span>
+              <span className={isDark ? 'text-[#00FF41] font-bold' : 'text-emerald-700 font-bold'}>NASDAQ ▲ 17,870 (+0.7%)</span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Theme Toggle Pill (Top Bar) */}
+            {onToggleTheme && (
+              <button
+                id="header-theme-toggle-top"
+                onClick={onToggleTheme}
+                className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[11px] font-mono font-medium transition cursor-pointer ${
+                  isDark
+                    ? 'bg-[#111111] border-white/15 hover:border-white/30 text-white/90'
+                    : 'bg-white border-zinc-300 hover:border-zinc-400 text-zinc-800 shadow-2xs'
+                }`}
+                title={`Switch to ${isDark ? 'High-Contrast Light' : 'Obsidian Dark'} Theme`}
+              >
+                {isDark ? (
+                  <>
+                    <Moon className="w-3 h-3 text-[#00FF41]" />
+                    <span className="uppercase tracking-wider">THEME: <strong className="text-white">OBSIDIAN</strong></span>
+                  </>
+                ) : (
+                  <>
+                    <Sun className="w-3 h-3 text-amber-500" />
+                    <span className="uppercase tracking-wider">THEME: <strong className="text-zinc-950">LIGHT</strong></span>
+                  </>
+                )}
+              </button>
+            )}
+
             {/* RBAC Role Switcher */}
             <div className="relative">
               <button
                 onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
-                className="flex items-center gap-1.5 bg-[#111111] border border-white/15 px-2.5 py-0.5 rounded-full hover:border-white/30 font-medium text-white/90 transition shadow-2xs cursor-pointer"
+                className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border font-medium transition cursor-pointer ${
+                  isDark
+                    ? 'bg-[#111111] border-white/15 hover:border-white/30 text-white/90 shadow-2xs'
+                    : 'bg-white border-zinc-300 hover:border-zinc-400 text-zinc-800 shadow-2xs'
+                }`}
                 title="Switch role to test Role-Based Access Control"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00FF41]"></span>
+                <span className={`w-1.5 h-1.5 rounded-full ${isDark ? 'bg-[#00FF41]' : 'bg-emerald-600'}`}></span>
                 <span className="text-[11px] uppercase tracking-wider font-mono">
-                  ROLE: <strong className="text-white capitalize">{currentUser.role.replace('_', ' ')}</strong>
+                  ROLE: <strong className={isDark ? 'text-white capitalize' : 'text-zinc-950 capitalize'}>{currentUser.role.replace('_', ' ')}</strong>
                 </span>
-                <ChevronDown className="w-3 h-3 text-white/40" />
+                <ChevronDown className={`w-3 h-3 ${isDark ? 'text-white/40' : 'text-zinc-400'}`} />
               </button>
 
               {isRoleDropdownOpen && (
-                <div className="absolute right-0 mt-1.5 w-64 bg-[#111111] border border-white/20 rounded-2xl shadow-2xl py-1.5 z-50 animate-in fade-in zoom-in-95">
-                  <div className="px-3.5 py-1.5 border-b border-white/10 text-[10px] font-mono uppercase tracking-[0.2em] text-[#00FF41]">
+                <div className={`absolute right-0 mt-1.5 w-64 rounded-2xl shadow-2xl py-1.5 z-50 animate-in fade-in zoom-in-95 border ${
+                  isDark
+                    ? 'bg-[#111111] border-white/20'
+                    : 'bg-white border-zinc-200 text-zinc-900'
+                }`}>
+                  <div className={`px-3.5 py-1.5 border-b text-[10px] font-mono uppercase tracking-[0.2em] ${
+                    isDark ? 'border-white/10 text-[#00FF41]' : 'border-zinc-100 text-emerald-700'
+                  }`}>
                     // SWITCH RBAC ROLE
                   </div>
                   {allUsers.map((u) => (
@@ -101,16 +161,20 @@ export const Header: React.FC<HeaderProps> = ({
                         onSwitchUser(u);
                         setIsRoleDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-3.5 py-2 text-xs flex items-center gap-2.5 hover:bg-white/5 transition ${
-                        u.id === currentUser.id ? 'bg-white/10 font-bold text-white' : 'text-white/70'
+                      className={`w-full text-left px-3.5 py-2 text-xs flex items-center gap-2.5 transition cursor-pointer ${
+                        isDark 
+                          ? `hover:bg-white/5 ${u.id === currentUser.id ? 'bg-white/10 font-bold text-white' : 'text-white/70'}`
+                          : `hover:bg-zinc-100 ${u.id === currentUser.id ? 'bg-zinc-100 font-bold text-zinc-950' : 'text-zinc-700'}`
                       }`}
                     >
-                      <img src={u.avatar} alt={u.name} className="w-6 h-6 rounded-full object-cover shrink-0 border border-white/20" />
+                      <img src={u.avatar} alt={u.name} className={`w-6 h-6 rounded-full object-cover shrink-0 border ${
+                        isDark ? 'border-white/20' : 'border-zinc-300'
+                      }`} />
                       <div className="flex-1 truncate">
-                        <div className="truncate font-semibold text-white">{u.name}</div>
-                        <div className="text-[10px] text-white/40 uppercase font-mono">{u.role.replace('_', ' ')}</div>
+                        <div className={`truncate font-semibold ${isDark ? 'text-white' : 'text-zinc-950'}`}>{u.name}</div>
+                        <div className={`text-[10px] uppercase font-mono ${isDark ? 'text-white/40' : 'text-zinc-400'}`}>{u.role.replace('_', ' ')}</div>
                       </div>
-                      {u.id === currentUser.id && <UserCheck className="w-4 h-4 text-[#00FF41] shrink-0" />}
+                      {u.id === currentUser.id && <UserCheck className={`w-4 h-4 shrink-0 ${isDark ? 'text-[#00FF41]' : 'text-emerald-600'}`} />}
                     </button>
                   ))}
                 </div>
@@ -119,7 +183,9 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={onOpenWhatsAppModal}
-              className="flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-emerald-400 hover:text-emerald-300 transition cursor-pointer"
+              className={`flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider transition cursor-pointer ${
+                isDark ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-700 hover:text-emerald-800 font-bold'
+              }`}
             >
               <Share2 className="w-3 h-3" />
               <span>WhatsApp Alerts</span>
@@ -139,17 +205,29 @@ export const Header: React.FC<HeaderProps> = ({
             }}
             className="flex items-center gap-3 text-left group cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center font-black text-lg tracking-tighter group-hover:bg-[#F27D26] group-hover:text-white transition">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-lg tracking-tighter transition ${
+              isDark
+                ? 'bg-white text-black group-hover:bg-[#F27D26] group-hover:text-white'
+                : 'bg-black text-white group-hover:bg-[#F27D26]'
+            }`}>
               PC
             </div>
             <div>
-              <div className="text-2xl font-black uppercase tracking-tighter text-white flex items-center gap-2">
+              <div className={`text-2xl font-black uppercase tracking-tighter flex items-center gap-2 ${
+                isDark ? 'text-white' : 'text-zinc-950'
+              }`}>
                 PRESSCORE
-                <span className="text-[9px] uppercase font-mono tracking-[0.2em] px-2 py-0.5 bg-white/10 text-[#00FF41] font-bold rounded-full border border-[#00FF41]/30">
+                <span className={`text-[9px] uppercase font-mono tracking-[0.2em] px-2 py-0.5 font-bold rounded-full border ${
+                  isDark 
+                    ? 'bg-white/10 text-[#00FF41] border-[#00FF41]/30' 
+                    : 'bg-zinc-100 text-emerald-700 border-emerald-500/30'
+                }`}>
                   AI OS
                 </span>
               </div>
-              <p className="text-[10px] text-white/40 font-mono tracking-widest uppercase">
+              <p className={`text-[10px] font-mono tracking-widest uppercase ${
+                isDark ? 'text-white/40' : 'text-zinc-500 font-semibold'
+              }`}>
                 NEWS • INSHORTS • AI ENGINE
               </p>
             </div>
@@ -157,13 +235,17 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Primary View Switcher Tabs */}
-        <div className="hidden lg:flex items-center bg-[#111111] p-1 rounded-full border border-white/10">
+        <div className={`hidden lg:flex items-center p-1 rounded-full border ${
+          isDark 
+            ? 'bg-[#111111] border-white/10' 
+            : 'bg-zinc-100 border-zinc-300'
+        }`}>
           <button
             onClick={() => onTabChange('portal')}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider transition cursor-pointer ${
               activeTab === 'portal'
-                ? 'bg-white text-black shadow-md'
-                : 'text-white/60 hover:text-white'
+                ? (isDark ? 'bg-white text-black shadow-md' : 'bg-black text-white shadow-md')
+                : (isDark ? 'text-white/60 hover:text-white' : 'text-zinc-600 hover:text-zinc-950')
             }`}
           >
             <Globe className="w-3.5 h-3.5" />
@@ -175,7 +257,7 @@ export const Header: React.FC<HeaderProps> = ({
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider transition cursor-pointer ${
               activeTab === 'inshorts'
                 ? 'bg-[#F27D26] text-white shadow-md'
-                : 'text-white/60 hover:text-white'
+                : (isDark ? 'text-white/60 hover:text-white' : 'text-zinc-600 hover:text-zinc-950')
             }`}
           >
             <Zap className="w-3.5 h-3.5" />
@@ -186,8 +268,8 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onTabChange('ai-lab')}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider transition cursor-pointer ${
               activeTab === 'ai-lab'
-                ? 'bg-white text-black shadow-md'
-                : 'text-white/60 hover:text-white'
+                ? (isDark ? 'bg-white text-black shadow-md' : 'bg-black text-white shadow-md')
+                : (isDark ? 'text-white/60 hover:text-white' : 'text-zinc-600 hover:text-zinc-950')
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
@@ -198,8 +280,8 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onTabChange('admin')}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider transition cursor-pointer ${
               activeTab === 'admin'
-                ? 'bg-white text-black shadow-md'
-                : 'text-white/60 hover:text-white'
+                ? (isDark ? 'bg-white text-black shadow-md' : 'bg-black text-white shadow-md')
+                : (isDark ? 'text-white/60 hover:text-white' : 'text-zinc-600 hover:text-zinc-950')
             }`}
           >
             <Shield className="w-3.5 h-3.5" />
@@ -210,50 +292,99 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Action icons */}
         <div className="flex items-center gap-2">
           {/* Mobile view toggle */}
-          <div className="lg:hidden flex items-center bg-[#111111] p-0.5 rounded-full border border-white/10">
+          <div className={`lg:hidden flex items-center p-0.5 rounded-full border ${
+            isDark ? 'bg-[#111111] border-white/10' : 'bg-zinc-100 border-zinc-300'
+          }`}>
             <button
               onClick={() => onTabChange('portal')}
-              className={`p-2 rounded-full text-xs font-medium ${activeTab === 'portal' ? 'bg-white text-black' : 'text-white/50'}`}
+              className={`p-2 rounded-full text-xs font-medium ${
+                activeTab === 'portal' 
+                  ? (isDark ? 'bg-white text-black' : 'bg-black text-white') 
+                  : (isDark ? 'text-white/50' : 'text-zinc-500')
+              }`}
               title="News"
             >
               <Globe className="w-4 h-4" />
             </button>
             <button
               onClick={() => onTabChange('inshorts')}
-              className={`p-2 rounded-full text-xs font-medium ${activeTab === 'inshorts' ? 'bg-[#F27D26] text-white' : 'text-white/50'}`}
+              className={`p-2 rounded-full text-xs font-medium ${activeTab === 'inshorts' ? 'bg-[#F27D26] text-white' : (isDark ? 'text-white/50' : 'text-zinc-500')}`}
               title="Inshorts"
             >
               <Zap className="w-4 h-4" />
             </button>
             <button
               onClick={() => onTabChange('ai-lab')}
-              className={`p-2 rounded-full text-xs font-medium ${activeTab === 'ai-lab' ? 'bg-white text-black' : 'text-white/50'}`}
+              className={`p-2 rounded-full text-xs font-medium ${
+                activeTab === 'ai-lab' 
+                  ? (isDark ? 'bg-white text-black' : 'bg-black text-white') 
+                  : (isDark ? 'text-white/50' : 'text-zinc-500')
+              }`}
               title="AI Studio"
             >
               <Sparkles className="w-4 h-4" />
             </button>
             <button
               onClick={() => onTabChange('admin')}
-              className={`p-2 rounded-full text-xs font-medium ${activeTab === 'admin' ? 'bg-white text-black' : 'text-white/50'}`}
+              className={`p-2 rounded-full text-xs font-medium ${
+                activeTab === 'admin' 
+                  ? (isDark ? 'bg-white text-black' : 'bg-black text-white') 
+                  : (isDark ? 'text-white/50' : 'text-zinc-500')
+              }`}
               title="Admin"
             >
               <Shield className="w-4 h-4" />
             </button>
           </div>
 
+          {/* Theme Toggle Button (Main Bar) */}
+          {onToggleTheme && (
+            <button
+              id="header-theme-toggle-btn"
+              onClick={onToggleTheme}
+              className={`p-2 rounded-full border transition cursor-pointer flex items-center justify-center ${
+                isDark
+                  ? 'text-white/70 hover:text-white bg-[#111111] hover:bg-[#1a1a1a] border-white/10 hover:border-white/25'
+                  : 'text-zinc-700 hover:text-black bg-zinc-100 hover:bg-zinc-200 border-zinc-300 hover:border-zinc-400'
+              }`}
+              title={`Switch to ${isDark ? 'High-Contrast Light' : 'Obsidian Dark'} Theme`}
+              aria-label="Toggle visual theme"
+            >
+              {isDark ? (
+                <Sun className="w-4 h-4 text-amber-400 hover:text-amber-300 transition-transform hover:rotate-12" />
+              ) : (
+                <Moon className="w-4 h-4 text-zinc-900 hover:text-black transition-transform hover:-rotate-12" />
+              )}
+            </button>
+          )}
+
           <button
             onClick={onOpenSearch}
-            className="flex items-center gap-2 bg-[#111111] hover:bg-[#1a1a1a] text-white/70 px-3.5 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition cursor-pointer border border-white/10 hover:border-white/20"
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition cursor-pointer border ${
+              isDark
+                ? 'bg-[#111111] hover:bg-[#1a1a1a] text-white/70 border-white/10 hover:border-white/20'
+                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border-zinc-300 hover:border-zinc-400'
+            }`}
             title="Search articles by title, tag, or author"
           >
-            <Search className="w-3.5 h-3.5 text-white/50" />
+            <Search className={`w-3.5 h-3.5 ${isDark ? 'text-white/50' : 'text-zinc-500'}`} />
             <span className="hidden sm:inline">Search...</span>
-            <kbd className="hidden sm:inline bg-black px-1.5 py-0.2 rounded text-[10px] text-white/40 border border-white/10 font-mono">⌘K</kbd>
+            <kbd className={`hidden sm:inline px-1.5 py-0.2 rounded text-[10px] border font-mono ${
+              isDark 
+                ? 'bg-black text-white/40 border-white/10' 
+                : 'bg-white text-zinc-500 border-zinc-300'
+            }`}>
+              ⌘K
+            </kbd>
           </button>
 
           <button
             onClick={onOpenBookmarks}
-            className="relative p-2 text-white/70 hover:text-white bg-[#111111] hover:bg-[#1a1a1a] border border-white/10 rounded-full transition cursor-pointer"
+            className={`relative p-2 rounded-full border transition cursor-pointer ${
+              isDark
+                ? 'text-white/70 hover:text-white bg-[#111111] hover:bg-[#1a1a1a] border-white/10'
+                : 'text-zinc-700 hover:text-black bg-zinc-100 hover:bg-zinc-200 border-zinc-300'
+            }`}
             title="Saved Bookmarks"
           >
             <Bookmark className="w-4 h-4" />
@@ -267,14 +398,16 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Category Navigation */}
-      <div className="border-t border-white/10 bg-black/60">
+      <div className={`border-t transition-colors duration-200 ${
+        isDark ? 'border-white/10 bg-black/60' : 'border-zinc-200 bg-zinc-50/90'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth text-xs">
           <button
             onClick={() => onSelectCategory(null)}
-            className={`px-3.5 py-1 rounded-full whitespace-nowrap font-black uppercase text-[11px] tracking-wider transition cursor-pointer shrink-0 ${
+            className={`px-3.5 py-1 rounded-full whitespace-nowrap font-black uppercase text-[11px] tracking-wider transition cursor-pointer shrink-0 border ${
               selectedCategory === null
-                ? 'bg-white text-black'
-                : 'text-white/60 hover:text-white hover:bg-white/5 border border-transparent'
+                ? (isDark ? 'bg-white text-black border-white' : 'bg-black text-white border-black')
+                : (isDark ? 'text-white/60 hover:text-white hover:bg-white/5 border-transparent' : 'text-zinc-600 hover:text-black hover:bg-zinc-200 border-transparent')
             }`}
           >
             All Stories
@@ -288,17 +421,21 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => onSelectCategory(isSelected ? null : cat.slug)}
                 className={`px-3.5 py-1 rounded-full whitespace-nowrap font-bold uppercase text-[11px] tracking-wider transition cursor-pointer flex items-center gap-1.5 shrink-0 border ${
                   isSelected
-                    ? 'bg-white text-black border-white'
-                    : 'text-white/60 hover:text-white hover:bg-white/5 border-white/10'
+                    ? (isDark ? 'bg-white text-black border-white' : 'bg-black text-white border-black')
+                    : (isDark ? 'text-white/60 hover:text-white hover:bg-white/5 border-white/10' : 'text-zinc-700 hover:text-black hover:bg-zinc-200 border-zinc-300')
                 }`}
               >
                 <span
                   className="w-1.5 h-1.5 rounded-full shrink-0"
-                  style={{ backgroundColor: isSelected ? '#000000' : cat.color || '#F27D26' }}
+                  style={{ backgroundColor: isSelected ? (isDark ? '#000000' : '#FFFFFF') : cat.color || '#F27D26' }}
                 />
                 <span>{cat.name}</span>
                 {cat.postCount > 0 && (
-                  <span className={`text-[9px] px-1.5 py-0.2 rounded-full font-mono font-bold ${isSelected ? 'bg-black text-white' : 'bg-white/10 text-white/50'}`}>
+                  <span className={`text-[9px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
+                    isSelected 
+                      ? (isDark ? 'bg-black text-white' : 'bg-white text-black')
+                      : (isDark ? 'bg-white/10 text-white/50' : 'bg-zinc-200 text-zinc-700')
+                  }`}>
                     {cat.postCount}
                   </span>
                 )}
