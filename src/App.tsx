@@ -62,7 +62,7 @@ export default function App() {
   // Theme State: 'dark' (Obsidian) | 'light' (High-Contrast Light)
   const [theme, setTheme] = useState<ThemeMode>(() => {
     const saved = localStorage.getItem('presscore_theme');
-    return (saved === 'light' || saved === 'dark') ? saved : 'dark';
+    return (saved === 'light' || saved === 'dark') ? saved : 'light';
   });
 
   // Sync theme with DOM and localStorage
